@@ -21,3 +21,8 @@
   },
   "type": "module"
 }
+"scripts": {
+  "migrate": "tsx --env-file=.env src/db/migrate.ts",
+  "migrate:down": "tsx --env-file=.env src/db/migrate.ts down",
+  "typecheck": "tsc --noEmit"
+},
