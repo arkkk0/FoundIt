@@ -21,7 +21,7 @@ export const Header: React.FC = () => {
               <Search />
               <input
                 type="text"
-                placeholder="Search lost & found items..."
+                placeholder="Search lost & found items"
               />
             </div>
           </div>
