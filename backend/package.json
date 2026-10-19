@@ -2,9 +2,12 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+"scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "migrate": "tsx --env-file=.env src/db/migrate.ts",
+  "migrate:down": "tsx --env-file=.env src/db/migrate.ts down",
+  "typecheck": "tsc --noEmit"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -21,8 +24,3 @@
   },
   "type": "module"
 }
-"scripts": {
-  "migrate": "tsx --env-file=.env src/db/migrate.ts",
-  "migrate:down": "tsx --env-file=.env src/db/migrate.ts down",
-  "typecheck": "tsc --noEmit"
-},
