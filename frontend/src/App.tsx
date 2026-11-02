@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Header } from './components/Header';
 import { AllPosts } from './pages/AllPosts';
 import { SinglePost } from './pages/SinglePost';
 import { CreatePost } from './pages/CreatePost';
