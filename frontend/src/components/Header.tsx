@@ -1,5 +1,6 @@
 import React from 'react';
-import { Search, PlusCircle, Bell, User, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, PlusCircle, Bell, User, MapPin } from 'lucide-react'
 
 export const Header: React.FC = () => {
   return (
@@ -7,12 +8,12 @@ export const Header: React.FC = () => {
       <div>
         <div>
           
-          {/* Logo & Brand */}
+          {/* Logo -> Links to / */}
           <div>
             <MapPin />
-            <a href="/">
+            <Link to="/">
               Found<span>It</span>
-            </a>
+            </Link>
           </div>
 
           {/* Quick Search Bar */}
@@ -21,17 +22,18 @@ export const Header: React.FC = () => {
               <Search />
               <input
                 type="text"
-                placeholder="Search lost & found items"
+                placeholder="Search lost & found items..."
               />
             </div>
           </div>
 
-          {/* Right Navigation Actions */}
+          {/* Actions */}
           <div>
-            <button>
+            {/* Create Post -> Links to /create */}
+            <Link to="/create">
               <PlusCircle />
               <span>Create Post</span>
-            </button>
+            </Link>
 
             <button aria-label="Notifications">
               <Bell />
