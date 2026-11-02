@@ -1,5 +1,6 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import { commentsRouter } from './routes/comments.js'
+import { postsRouter } from './routes/posts.js'
 
 export const app = express()
 
@@ -10,6 +11,7 @@ app.get('/health', (_req: Request, res: Response) => {
 })
 
 app.use(commentsRouter)
+app.use('/posts', postsRouter)
 
 // Unknown routes
 app.use((_req: Request, res: Response) => {
