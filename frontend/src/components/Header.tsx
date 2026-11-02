@@ -4,12 +4,12 @@ import { Search, PlusCircle, Bell, User, MapPin } from 'lucide-react'
 
 export const Header: React.FC = () => {
   return (
-    <header>
+    <header className="header">
       <div>
-        <div>
+        <div className="header-inner">
           
           {/* Logo -> Links to / */}
-          <div>
+          <div className="logo">
             <MapPin />
             <Link to="/">
               Found<span>It</span>
@@ -18,7 +18,7 @@ export const Header: React.FC = () => {
 
           {/* Quick Search Bar */}
           <div>
-            <div>
+            <div className="search">
               <Search />
               <input
                 type="text"
@@ -28,9 +28,9 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Actions */}
-          <div>
+          <div className="actions">
             {/* Create Post -> Links to /create */}
-            <Link to="/create">
+            <Link to="/create" className="button">
               <PlusCircle />
               <span>Create Post</span>
             </Link>
@@ -39,7 +39,7 @@ export const Header: React.FC = () => {
               <Bell />
             </button>
 
-            <button>
+            <button className="button button-outline">
               <User />
               <span>Sign In</span>
             </button>
