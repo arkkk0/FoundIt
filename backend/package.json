@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --env-file=.env node_modules/vitest/vitest.mjs run --no-file-parallelism",
     "migrate": "tsx --env-file=.env src/db/migrate.ts",
     "migrate:down": "tsx --env-file=.env src/db/migrate.ts down",
     "typecheck": "tsc --noEmit",
@@ -23,8 +23,11 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.5",
     "@types/pg": "^8.23.1",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.3.2",
     "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^3.2.7"
   },
   "type": "module"
 }
