@@ -11,11 +11,19 @@ type UpdatedAt = ColumnType<Date, Date | string | undefined, Date | string>
 
 export interface UsersTable {
   id: Generated<number>
-  google_sub: string
+  google_sub: string | null
+  password_hash: string | null
   email: string
   display_name: string
   role: UserRole
   created_at: CreatedAt
+}
+
+export interface SessionsTable {
+  id: string
+  user_id: number
+  created_at: CreatedAt
+  expires_at: Date | string
 }
 
 export interface CategoriesTable {
@@ -84,6 +92,7 @@ export interface MatchSuggestionsTable {
 
 export interface Database {
   users: UsersTable
+  sessions: SessionsTable
   categories: CategoriesTable
   drop_off_points: DropOffPointsTable
   posts: PostsTable
@@ -95,3 +104,9 @@ export interface Database {
 export type Post = Selectable<PostsTable>
 export type NewPost = Insertable<PostsTable>
 export type PostUpdate = Updateable<PostsTable>
+
+// A user as returned by the API: never includes password_hash
+export type PublicUser = Pick<
+  Selectable<UsersTable>,
+  'id' | 'email' | 'display_name' | 'role' | 'created_at'
+>
