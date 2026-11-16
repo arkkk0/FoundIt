@@ -3,6 +3,7 @@
 ```mermaid
 erDiagram
     USER ||--o{ POST : "creates"
+    USER ||--o{ SESSION : "logs in with"
     USER ||--o{ COMMENT : "writes"
     USER ||--o{ CLAIM : "submits"
     USER |o--o{ CLAIM : "reviews"
@@ -16,11 +17,18 @@ erDiagram
 
     USER {
         int id PK
-        string google_sub UK
+        string google_sub UK "nullable, set for Google accounts"
+        string password_hash "nullable, set for password accounts"
         string email UK
         string display_name
         string role "student or staff"
         datetime created_at
+    }
+    SESSION {
+        string id PK "SHA-256 of the cookie token"
+        int user_id FK
+        datetime created_at
+        datetime expires_at
     }
     CATEGORY {
         int id PK

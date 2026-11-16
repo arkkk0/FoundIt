@@ -1,22 +1,16 @@
 import type { NextFunction, Request, Response } from 'express'
-import { db } from '../db/index.js'
+import { getSessionUser } from '../auth/sessions.js'
 
-// Temporary stand-in for Google login: identifies the user from an x-user-id header.
+// Requires a valid login session (the "sid" cookie set by /auth/login or /auth/signup).
+// On success: res.locals.userId is the logged-in user's id, res.locals.sessionId the session's id.
 export async function requireUser(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const raw = req.header('x-user-id')
-  const id = Number(raw)
-
-  if (raw === undefined || !Number.isInteger(id) || id <= 0 || id > 2147483647) {
-    res.status(401).json({ error: 'Missing or invalid x-user-id header' })
+  const session = await getSessionUser(req)
+  if (!session) {
+    res.status(401).json({ error: 'You must be logged in' })
     return
   }
 
-  const user = await db.selectFrom('users').select('id').where('id', '=', id).executeTakeFirst()
-  if (!user) {
-    res.status(401).json({ error: 'Unknown user' })
-    return
-  }
-
-  res.locals.userId = id
+  res.locals.userId = session.user.id
+  res.locals.sessionId = session.sessionId
   next()
 }

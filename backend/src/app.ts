@@ -1,6 +1,8 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
+import { authRouter } from './routes/auth.js'
 import { commentsRouter } from './routes/comments.js'
 import { postsRouter } from './routes/posts.js'
+import { usersRouter } from './routes/users.js'
 
 export const app = express()
 
@@ -10,6 +12,8 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' })
 })
 
+app.use('/auth', authRouter)
+app.use('/users', usersRouter)
 app.use(commentsRouter)
 app.use('/posts', postsRouter)
 
