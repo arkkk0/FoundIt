@@ -2,6 +2,7 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import { authRouter } from './routes/auth.js'
 import { commentsRouter } from './routes/comments.js'
 import { postsRouter } from './routes/posts.js'
+import { uploadsRouter } from './routes/uploads.js'
 import { usersRouter } from './routes/users.js'
 
 export const app = express()
@@ -15,6 +16,7 @@ app.get('/health', (_req: Request, res: Response) => {
 app.use('/auth', authRouter)
 app.use('/users', usersRouter)
 app.use(commentsRouter)
+app.use(uploadsRouter)
 app.use('/posts', postsRouter)
 
 // Unknown routes
