@@ -1,8 +1,10 @@
 import React, { useEffect, useState, type SubmitEvent,} from 'react';
 import { postImageUrl, uploadPhoto } from '../api/uploadPhoto';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../auth';
 
 type Post = {
+  author_id: number;
   id: number;
   type: 'lost' | 'found';
   title: string;
@@ -30,6 +32,7 @@ function toLocalDateTime(value: string) {
 export const EditPost = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
 
   const [post, setPost] = useState<Post | null>(null);
   const [postType, setPostType] = useState<'lost' | 'found'>('lost');
@@ -155,7 +158,7 @@ export const EditPost = () => {
     }
   }
 
-  if (loading) {
+  if (loading|| authLoading) {
     return <main><p>Loading post...</p></main>;
   }
 
@@ -167,6 +170,8 @@ export const EditPost = () => {
       </main>
     );
   }
+  if (!user) return <p><Link to="/login">Sign in</Link> to edit your post.</p>;
+  if (post.author_id !== user.id) return <p>Only the owner can edit this post.</p>;
 
   return (
     <main>

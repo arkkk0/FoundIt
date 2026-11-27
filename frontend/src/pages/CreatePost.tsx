@@ -1,8 +1,10 @@
 import React, { useState, type SubmitEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../auth';
 import { uploadPhoto } from '../api/uploadPhoto';
 
 export const CreatePost = () => {
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [postType, setPostType] = useState<'lost' | 'found'>('lost');
   const [submitting, setSubmitting] = useState(false);
@@ -43,7 +45,6 @@ export const CreatePost = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          author_id: Number(text('author_id')),
           category_id: Number(text('category_id')),
           type: postType,
           title,
@@ -77,6 +78,8 @@ export const CreatePost = () => {
     }
   }
 
+  if (loading) return <p>Checking session…</p>;
+  if (!user) return <p><Link to="/login">Sign in</Link> to create a post.</p>;
   return (
     <main>
       <h1>Create New Post</h1>
@@ -86,18 +89,6 @@ export const CreatePost = () => {
       <form onSubmit={handleSubmit}>
         <fieldset disabled={submitting}>
           <legend>Post details</legend>
-
-          <p>
-            <label htmlFor="author_id">Author ID (temporary local testing)</label>
-            <input
-              id="author_id"
-              name="author_id"
-              type="number"
-              min="1"
-              step="1"
-              required
-            />
-          </p>
 
           <p>
             <label htmlFor="type">Post Type</label>
