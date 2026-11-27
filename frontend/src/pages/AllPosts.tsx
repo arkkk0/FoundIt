@@ -1,5 +1,6 @@
 import React,{ useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { postImageUrl } from '../api/uploadPhoto';
 
 type PostSummary = {
   id: number;
@@ -8,6 +9,7 @@ type PostSummary = {
   description: string;
   location_label: string | null;
   status: 'open' | 'returned';
+  image_key: string | null;
 };
 
 export const AllPosts = () => {
@@ -65,6 +67,9 @@ export const AllPosts = () => {
           {posts.map((post) => (
             <li key={post.id}>
               <article>
+                {post.image_key && (
+                  <img src={postImageUrl(post.id)} alt={post.title} width={240} />
+                )}
                 <h2>
                   <Link to={`/posts/${post.id}`}>{post.title}</Link>
                 </h2>

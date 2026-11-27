@@ -1,4 +1,5 @@
 import React, { useEffect, useState, type SubmitEvent,} from 'react';
+import { postImageUrl, uploadPhoto } from '../api/uploadPhoto';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth';
 
@@ -91,13 +92,16 @@ export const EditPost = () => {
 
     const title = text('title');
     const description = text('description');
-    const imageKey = text('image_key');
+    const photo = data.get('photo');
+    const newPhoto = photo instanceof File && photo.size > 0 ? photo : null;
+    const currentImageKey = post?.image_key ?? null;
     const verificationQuestion = text('verification_question');
 
     if (
       !title ||
       !description ||
-      (postType === 'found' && (!imageKey || !verificationQuestion))
+      (postType === 'found' &&
+        (!(newPhoto || currentImageKey) || !verificationQuestion))
     ) {
       setSaveError('Please complete all required fields.');
       return;
@@ -107,6 +111,14 @@ export const EditPost = () => {
     setSaveError('');
 
     try {
+      // Keep the current photo unless a new one was chosen
+      const imageKey =
+        postType !== 'found'
+          ? null
+          : newPhoto
+            ? await uploadPhoto(newPhoto)
+            : currentImageKey;
+
       const response = await fetch(`/api/posts/${id}`, {
         method: 'PUT',
         headers: {
@@ -121,7 +133,7 @@ export const EditPost = () => {
           latitude: Number(text('latitude')),
           longitude: Number(text('longitude')),
           event_date: new Date(text('event_date')).toISOString(),
-          image_key: postType === 'found' ? imageKey : null,
+          image_key: imageKey,
           verification_question:
             postType === 'found' ? verificationQuestion : null,
           drop_off_point_id:
@@ -271,12 +283,18 @@ export const EditPost = () => {
           {postType === 'found' && (
             <>
               <p>
-                <label htmlFor="image_key">Image Key / URL</label>
+                <label htmlFor="photo">
+                  {post.image_key ? 'Replace photo (optional)' : 'Photo'}
+                </label>
+                {post.image_key && (
+                  <img src={postImageUrl(post.id)} alt="Current photo" width={160} />
+                )}
                 <input
-                  id="image_key"
-                  name="image_key"
-                  defaultValue={post.image_key ?? ''}
-                  required
+                  id="photo"
+                  name="photo"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  required={!post.image_key}
                 />
               </p>
 

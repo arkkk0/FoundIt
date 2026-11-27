@@ -1,6 +1,7 @@
 import React, { useState, type SubmitEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth';
+import { uploadPhoto } from '../api/uploadPhoto';
 
 export const CreatePost = () => {
   const { user, loading } = useAuth();
@@ -17,13 +18,14 @@ export const CreatePost = () => {
 
     const title = text('title');
     const description = text('description');
-    const imageKey = text('image_key');
+    const photo = data.get('photo');
+    const hasPhoto = photo instanceof File && photo.size > 0;
     const verificationQuestion = text('verification_question');
 
     if (
       !title ||
       !description ||
-      (postType === 'found' && (!imageKey || !verificationQuestion))
+      (postType === 'found' && (!hasPhoto || !verificationQuestion))
     ) {
       setError('Please complete all required fields.');
       return;
@@ -33,6 +35,10 @@ export const CreatePost = () => {
     setError('');
 
     try {
+      // Found posts need a photo: upload it first, then save its key with the post
+      const imageKey =
+        postType === 'found' && hasPhoto ? await uploadPhoto(photo as File) : null;
+
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: {
@@ -47,7 +53,7 @@ export const CreatePost = () => {
           longitude: Number(text('longitude')),
           location_label: text('location_label') || null,
           event_date: new Date(text('event_date')).toISOString(),
-          image_key: postType === 'found' ? imageKey : null,
+          image_key: imageKey,
           verification_question:
             postType === 'found' ? verificationQuestion : null,
           drop_off_point_id:
@@ -170,8 +176,14 @@ export const CreatePost = () => {
           {postType === 'found' && (
             <>
               <p>
-                <label htmlFor="image_key">Image Key / URL</label>
-                <input id="image_key" name="image_key" type="text" required />
+                <label htmlFor="photo">Photo</label>
+                <input
+                  id="photo"
+                  name="photo"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  required
+                />
               </p>
 
               <p>

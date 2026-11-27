@@ -1,6 +1,7 @@
 import React, { useEffect, useState, type SubmitEvent } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
+import { postImageUrl } from '../api/uploadPhoto';
 
 type Post = {
   id: number;
@@ -11,6 +12,7 @@ type Post = {
   location_label: string | null;
   event_date: string;
   status: 'open' | 'returned';
+  image_key: string | null;
 };
 
 type Comment = {
@@ -181,6 +183,9 @@ export const SinglePost = () => {
 
       <article>
         <h1>{post.title}</h1>
+        {post.image_key && (
+          <img src={postImageUrl(post.id)} alt={post.title} width={400} />
+        )}
         <p>
           {post.type === 'lost' ? 'Lost' : 'Found'} · {post.status}
         </p>
