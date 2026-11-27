@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useState }  from 'react';
+import { useAuth } from '../auth';
 import { Link } from 'react-router-dom';
-import { Search, PlusCircle, Bell, User, MapPin } from 'lucide-react'
+import { Search, PlusCircle, Bell, MapPin } from 'lucide-react'
 
 export const Header: React.FC = () => {
+  const { user, loading, logout } = useAuth();
+  const [signingOut, setSigningOut] = useState(false);
+  const [error, setError] = useState('');
+
+  async function signOut() {
+    setSigningOut(true);
+    setError('');
+    try {
+      await logout();
+    } catch {
+      setError('Could not sign out. Please try again.');
+    } finally {
+      setSigningOut(false);
+    }
+}
   return (
     <header className="header">
       <div>
@@ -39,10 +55,17 @@ export const Header: React.FC = () => {
               <Bell />
             </button>
 
-            <button className="button button-outline">
-              <User />
-              <span>Sign In</span>
-            </button>
+              {!loading && (user ? (
+              <>
+                <span>{user.display_name}</span>
+                <button type="button" onClick={signOut} disabled={signingOut}>
+                  Log out
+                </button>
+              </>
+            ) : (
+              <Link to="/login">Sign In</Link>
+            ))}
+            {error && <span role="alert">{error}</span>}
           </div>
 
         </div>

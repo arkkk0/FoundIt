@@ -40,10 +40,12 @@ commentsRouter.get('/posts/:postId/comments', async (req: Request, res: Response
 
   const comments = await db
     .selectFrom('comments')
-    .selectAll()
-    .where('post_id', '=', postId)
-    .orderBy('created_at', 'asc')
-    .orderBy('id', 'asc')
+    .innerJoin('users', 'users.id', 'comments.author_id')
+    .selectAll('comments')
+    .select('users.display_name as author_name')
+    .where('comments.post_id', '=', postId)
+    .orderBy('comments.created_at', 'asc')
+    .orderBy('comments.id', 'asc')
     .execute()
 
   res.json(comments)
@@ -76,8 +78,14 @@ commentsRouter.post('/posts/:postId/comments', requireUser, async (req: Request,
     .returningAll()
     .executeTakeFirstOrThrow()
 
-  res.status(201).json(comment)
-})
+  const author = await db
+    .selectFrom('users')
+    .select('display_name')
+    .where('id', '=', userId)
+    .executeTakeFirstOrThrow()
+
+  res.status(201).json({ ...comment, author_name: author.display_name })
+  })
 
 // Edit your own comment
 commentsRouter.put('/comments/:id', requireUser, async (req: Request, res: Response) => {

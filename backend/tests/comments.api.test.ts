@@ -30,8 +30,7 @@ beforeEach(async () => {
   bob = await signup('bob@test.com')
 
   const category = await db.selectFrom('categories').select('id').orderBy('id').executeTakeFirstOrThrow()
-  const post = await request(app).post('/posts').send({
-    author_id: alice.id,
+  const post = await request(app).post('/posts').set('Cookie', alice.cookie).send({
     category_id: category.id,
     type: 'lost',
     title: 'Blue water bottle',
@@ -40,6 +39,7 @@ beforeEach(async () => {
     longitude: -80.73,
     event_date: '2026-11-10',
   })
+  expect(post.status).toBe(201)
   postId = post.body.id
 })
 afterAll(async () => {

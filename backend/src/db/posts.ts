@@ -25,7 +25,7 @@ export async function getPostById(id: number) {
     .executeTakeFirst()
 }
 
-export async function updatePost(id: number, changes: PostUpdate) {
+export async function updatePost(id: number, authorId: number, changes: PostUpdate) {
   return db
     .updateTable('posts')
     .set({
@@ -33,13 +33,15 @@ export async function updatePost(id: number, changes: PostUpdate) {
       updated_at: new Date()
     })
     .where('id', '=', id)
+    .where('author_id', '=', authorId)
     .returningAll()
     .executeTakeFirst()
 }
 
-export async function deletePost(id: number) {
+export async function deletePost(id: number, authorId: number) {
   return db
     .deleteFrom('posts')
     .where('id', '=', id)
+    .where('author_id', '=', authorId)
     .executeTakeFirst()
 }

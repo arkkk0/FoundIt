@@ -1,8 +1,10 @@
 import React, { useEffect, useState, type SubmitEvent } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth';
 
 type Post = {
   id: number;
+  author_id: number;
   title: string;
   type: 'lost' | 'found';
   description: string;
@@ -12,17 +14,20 @@ type Post = {
 };
 
 type Comment = {
+  author_name: string;
   id: number;
   author_id: number;
   body: string;
   created_at: string;
 };
 
-// Temporary local user until login is connected.
-const TEST_USER_ID = 1;
 
 export const SinglePost = () => {
   const { id } = useParams<{ id: string }>();
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [body, setBody] = useState('');
@@ -115,7 +120,6 @@ export const SinglePost = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': String(TEST_USER_ID),
         },
         body: JSON.stringify({ body: trimmedBody }),
       });
@@ -134,6 +138,27 @@ export const SinglePost = () => {
       );
     } finally {
       setSubmitting(false);
+    }
+  }
+    async function removePost() {
+    if (!post || !window.confirm('Delete this post and its comments?')) return;
+
+    setDeleting(true);
+    setDeleteError('');
+
+    try {
+      const response = await fetch(`/api/posts/${post.id}`, { method: 'DELETE' });
+
+      if (!response.ok) {
+        const failure = await response.json().catch(() => null);
+        throw new Error(failure?.error ?? 'Could not delete post.');
+      }
+
+      navigate('/', { replace: true });
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Could not delete post.');
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -171,7 +196,15 @@ export const SinglePost = () => {
           </time>
         </p>
 
-        <Link to={`/posts/${post.id}/edit`}>Edit post</Link>
+        {user?.id === post.author_id && (
+  <p>
+    <Link to={`/posts/${post.id}/edit`}>Edit post</Link>{' '}
+    <button type="button" onClick={removePost} disabled={deleting}>
+      {deleting ? 'Deleting…' : 'Delete post'}
+    </button>
+  </p>
+)}
+{deleteError && <p role="alert">{deleteError}</p>}
       </article>
 
       <section>
@@ -188,7 +221,7 @@ export const SinglePost = () => {
             <li key={comment.id}>
               <p>{comment.body}</p>
               <p>
-                User {comment.author_id} ·{' '}
+                 {comment.author_name} ·{' '}
                 <time dateTime={comment.created_at}>
                   {new Date(comment.created_at).toLocaleString()}
                 </time>
@@ -197,7 +230,7 @@ export const SinglePost = () => {
           ))}
         </ul>
 
-        <form onSubmit={handleSubmit}>
+        {user ? (<form onSubmit={handleSubmit}>
           <label htmlFor="comment">Add a comment</label>
           <textarea
             id="comment"
@@ -216,6 +249,9 @@ export const SinglePost = () => {
             {submitting ? 'Posting...' : 'Post Comment'}
           </button>
         </form>
+        ) : !authLoading && (
+          <p><Link to="/login">Sign in</Link> to comment.</p>
+        )}
       </section>
     </main>
   );
